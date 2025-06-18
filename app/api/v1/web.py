@@ -162,5 +162,3 @@ async def connect_cxd(request: Request, user=Depends(require_authenticated_user)
         "connect.html",
         {"request": request, "username": user.user_name, "user_id": user.user_id}
     )
-
-
