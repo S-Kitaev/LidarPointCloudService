@@ -5,6 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Просмотр облака</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
+  <style>
+    .experiments-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .experiment-card {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .experiment-card:hover {
+      background: #e9ecef;
+      border-color: #006D75;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .experiment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .experiment-id {
+      background: #006D75;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    .experiment-date {
+      color: #6c757d;
+      font-size: 14px;
+    }
+    
+    .experiment-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .detail-item {
+      margin-bottom: 10px;
+    }
+    
+    .detail-label {
+      font-weight: bold;
+      color: #495057;
+      margin-bottom: 5px;
+    }
+    
+    .detail-value {
+      color: #212529;
+    }
+    
+    .no-experiments {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+      font-size: 18px;
+    }
+    
+    .view-button {
+      background: #006D75;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+    
+    .view-button:hover {
+      background: #005a61;
+    }
+  </style>
 </head>
 <body>
   <header class="main-header">
@@ -22,7 +108,62 @@
   </header>
 
   <main class="main-content">
-    <h1>Скоро добавим просмотр облака точек</h1>
+    <div class="experiments-container">
+      <h1>Выберите эксперимент для просмотра</h1>
+      
+      {% if experiments %}
+        {% for experiment in experiments %}
+        <div class="experiment-card" onclick="viewExperiment({{ experiment.id }})">
+          <div class="experiment-header">
+            <span class="experiment-id">ID: {{ experiment.id }}</span>
+            <span class="experiment-date">
+              {% if experiment.exp_dt %}
+                {{ experiment.exp_dt.strftime('%d.%m.%Y %H:%M') }}
+              {% else %}
+                Дата не указана
+              {% endif %}
+            </span>
+          </div>
+          
+          <div class="experiment-details">
+            <div class="detail-item">
+              <div class="detail-label">Описание помещения:</div>
+              <div class="detail-value">
+                {{ experiment.room_description or 'Не указано' }}
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Адрес:</div>
+              <div class="detail-value">{{ experiment.address }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Описание объекта:</div>
+              <div class="detail-value">
+                {{ experiment.object_description or 'Не указано' }}
+              </div>
+            </div>
+          </div>
+          
+          <button class="view-button" onclick="event.stopPropagation(); viewExperiment({{ experiment.id }})">
+            Просмотреть облако точек
+          </button>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-experiments">
+          <p>Пока нет доступных экспериментов.</p>
+          <p>Создайте первый эксперимент на странице "Создание облака точек".</p>
+        </div>
+      {% endif %}
+    </div>
   </main>
+
+  <script>
+    function viewExperiment(experimentId) {
+      window.location.href = `/{{ user_id }}/check/${experimentId}`;
+    }
+  </script>
 </body>
 </html>

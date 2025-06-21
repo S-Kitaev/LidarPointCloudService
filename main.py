@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
@@ -44,7 +45,7 @@ app.openapi = custom_openapi
 
 
 # Статика для CSS/JS/картинок
-app.mount("/static", StaticFiles(directory="templates"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # CORS — разрешаем фронту на 8000/8001
 app.add_middleware(

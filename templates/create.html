@@ -1,28 +1,100 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Создание облака</title>
-  <link rel="stylesheet" href="/static/css/main.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание эксперимента</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/create.css">
 </head>
 <body>
-  <header class="main-header">
-    <div class="logo-white"></div>
-    <nav class="main-nav">
-      <a href="/{{ user_id }}" class="nav-item">Главная</a>
-      <a href="/{{ user_id }}/create" class="nav-item active">Создание облака точек</a>
-      <a href="/{{ user_id }}/check" class="nav-item">Просмотр облака точек</a>
-      <a href="/{{ user_id }}/connect" class="nav-item">Подключение к ЦХД</a>
-    </nav>
-    <div class="user-section">
-      <span class="user-name">{{ username }}</span>
-      <div class="user-icon"></div>
-    </div>
-  </header>
+    <header class="main-header">
+        <div class="logo-white"></div>
+        <nav class="main-nav">
+          <a href="/{{ user_id }}" class="nav-item">Главная</a>
+          <a href="/{{ user_id }}/create" class="nav-item active">Создание облака точек</a>
+          <a href="/{{ user_id }}/check" class="nav-item">Просмотр облака точек</a>
+          <a href="/{{ user_id }}/connect" class="nav-item">Подключение к ЦХД</a>
+        </nav>
+        <div class="user-section">
+          <span class="user-name">{{ username }}</span>
+          <div class="user-icon"></div>
+        </div>
+    </header>
 
-  <main class="main-content">
-    <h1>Скоро добавим создание облака точек</h1>
-  </main>
+    <main class="main-content">
+        <div class="experiment-container">
+            <!-- Левая колонка - данные эксперимента -->
+            <div class="params-section">
+                <h2 class="params-title">Параметры эксперимента</h2>
+
+                <div class="form-group">
+                    <label for="date">Дата</label>
+                    <input type="datetime-local" id="date">
+                </div>
+
+                <div class="form-group">
+                    <label for="room">Описание помещения</label>
+                    <input type="text" id="room" placeholder="Введите описание помещения">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Адрес</label>
+                    <input type="text" id="address" placeholder="Введите адрес">
+                </div>
+
+                <div class="form-group">
+                    <label for="object">Описание объекта</label>
+                    <textarea id="object" placeholder="Подробно опишите объект исследования"></textarea>
+                </div>
+
+                <button class="save-btn" id="saveBtn" disabled>Сохранить эксперимент</button>
+                <div class="success-message" id="successMessage">
+                    Эксперимент успешно сохранен!
+                </div>
+            </div>
+
+            <!-- Правая колонка - загрузка файла и данные -->
+            <div class="data-section">
+                <h2 class="data-title">Загрузка данных измерений</h2>
+
+                <div class="upload-area" id="dropZone">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Перетащите файл с данными в эту область!</div>
+                    <div class="upload-hint">Поддерживаемый формат: .txt (угол phi; R; угол theta)</div>
+                    <button class="browse-button">Выбрать файл</button>
+                    <input type="file" class="file-input" id="fileInput" accept=".txt">
+                </div>
+
+                <div class="data-preview-info" id="dataPreviewInfo">
+                    Ниже приведены первые 10 строк файла
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Угол Phi (°)</th>
+                                <th>Расстояние R</th>
+                                <th>Угол Theta (°)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <tr>
+                                <td colspan="3" style="text-align: center; padding: 30px; color: #999;">
+                                    Данные не загружены
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/js/create.js"></script>
 </body>
 </html>
+

@@ -1,0 +1,26 @@
+erDiagram
+    measurements {
+        integer id PK "serial, increments, unique"
+        integer experiment_id FK "references experiments.id"
+        real fi
+        real theta
+        real r
+        integer position
+    }
+    
+    experiments {
+        integer id PK "serial, increments, unique"
+        timestamp exp_dt
+        varchar room_description
+        varchar address
+        varchar object_description
+    }
+    
+    users {
+        integer id PK "serial, increments, unique"
+        varchar user_name "unique"
+        varchar user_password
+        varchar email
+    }
+
+    experiments ||--o{ measurements : ""
