@@ -66,7 +66,7 @@ BASE_DIR = Path(__file__).resolve().parent
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    return FileResponse(BASE_DIR / "templates" / "images" / "logo.png")
+    return FileResponse(BASE_DIR / "static" / "images" / "logo.png")
 
 
 # Перехватываем 401 и редиректим на /login

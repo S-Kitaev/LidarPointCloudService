@@ -1,8 +1,8 @@
 // Функция для преобразования сферических координат в декартовы (в метрах)
 function sphericalToCartesian(phi, r, theta) {
-    const x = r * Math.sin(theta) * Math.cos(phi);
-    const y = r * Math.sin(theta) * Math.sin(phi);
-    const z = r * Math.cos(theta);
+    const x = r * Math.sin(theta*Math.PI/180) * Math.cos(phi*Math.PI/180);
+    const y = r * Math.sin(theta*Math.PI/180) * Math.sin(phi*Math.PI/180);
+    const z = r * Math.cos(theta*Math.PI/180);
     return { x: x / 1000, y: y / 1000, z: z / 1000 };
 }
 
