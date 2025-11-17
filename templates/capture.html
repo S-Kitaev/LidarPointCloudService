@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Снять облако точек</title>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  <link rel="stylesheet" href="/static/css/capture.css"/>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-white"></div>
+    <nav class="main-nav">
+      <a href="/{{ user_id }}" class="nav-item">Главная</a>
+      <a href="/{{ user_id }}/create" class="nav-item">Создание облака точек</a>
+      <a href="/{{ user_id }}/check" class="nav-item">Просмотр облака точек</a>
+      <a href="/{{ user_id }}/connect" class="nav-item">Подключение к ЦХД</a>
+      <a href="/{{ user_id }}/capture" class="nav-item active">Снять облако точек</a>
+    </nav>
+    <div class="user-section">
+      <span class="user-name">{{ username }}</span>
+      <div class="user-icon"></div>
+    </div>
+  </header>
+
+<main class="capture-main">
+  <div class="capture-layout">
+
+    <!-- Левая колонка -->
+    <div class="capture-left-column">
+      <!-- Подключение -->
+      <section class="capture-card">
+        <button class="capture-accordion-toggle" data-target="#connection-panel">
+          Подключение к лидару
+          <span class="capture-accordion-arrow">▼</span>
+        </button>
+        <div id="connection-panel" class="capture-accordion-panel open">
+          <div class="capture-form-group">
+            <button id="btn-check-connection" class="capture-btn">
+              Проверить соединение с лидаром
+            </button>
+          </div>
+          <div class="capture-form-group">
+            <button id="btn-connect-ssh" class="capture-btn">
+              Подключиться к плате
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Параметры съёмки -->
+      <section class="capture-card">
+        <button class="capture-accordion-toggle" data-target="#scan-panel">
+          Параметры съемки
+          <span class="capture-accordion-arrow">▼</span>
+        </button>
+        <div id="scan-panel" class="capture-accordion-panel">
+          <div class="capture-form-group">
+            <label for="scan_range">Диапазон (градусы)</label>
+            <input id="scan_range" type="number" value="240">
+          </div>
+          <div class="capture-form-group">
+            <label for="scan_step">Шаг (градусы)</label>
+            <input id="scan_step" type="number" value="5">
+          </div>
+          <div class="capture-form-group">
+            <label for="lidar_duration">Длительность (сек)</label>
+            <input id="lidar_duration" type="number" value="10">
+          </div>
+          <div class="capture-form-group">
+            <label for="pulse_delay">Задержка импульса (сек)</label>
+            <input id="pulse_delay" type="number" value="0.006" step="0.001">
+          </div>
+
+          <div class="capture-buttons-row">
+            <button id="btn-lidar-test" class="capture-btn" disabled>Проверка лидара</button>
+            <button id="btn-engine-test" class="capture-btn" disabled>Проверка двигателя</button>
+            <button id="btn-start-scan" class="capture-btn" disabled>Запуск съемки</button>
+            <button id="btn-stop-scan" class="capture-btn" disabled>Прервать съемку</button>
+            <button id="btn-download" class="capture-btn" disabled>Скачать облако точек</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Правая колонка (лог) -->
+    <section class="capture-log-section">
+      <h2 class="capture-log-title">Лог выполнения</h2>
+      <div id="log-output" class="capture-log-output"></div>
+    </section>
+
+  </div>
+
+  <script src="/static/js/capture.js"></script>
+</main>
+</body>
+</html>

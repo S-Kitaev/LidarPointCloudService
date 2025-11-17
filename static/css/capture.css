@@ -1,0 +1,232 @@
+.capture-main {
+    max-width: 1400px;
+    margin: 100px auto 50px;
+    padding: 0 20px;
+}
+
+/* Заголовок */
+.capture-main h1 {
+    font-size: 32px;
+    color: #00474D;
+    margin-bottom: 20px;
+}
+
+/* Контейнер с двумя колонками */
+.capture-layout {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+/* Левая колонка: подключение + параметры съёмки */
+.capture-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 0 0 520px; /* фиксированная ширина колонки слева */
+}
+
+/* Правая колонка: лог */
+.capture-log-section {
+    flex: 1 1 auto;
+    min-width: 420px;
+    max-width: calc(100% - 520px);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+}
+
+.capture-log-title {
+    font-size: 24px;
+    color: #006D75;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #87E8DE;
+}
+
+/* ===== Карточки-блоки слева (подключение, параметры) ===== */
+
+.capture-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 20px 20px 15px;
+}
+
+/* Кнопка-заголовок аккордеона */
+.capture-accordion-toggle {
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #e6f7ff;
+    color: #006D75;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.capture-accordion-toggle:hover {
+    background: #ccefff;
+    transform: translateY(-1px);
+}
+
+.capture-accordion-toggle .capture-accordion-arrow {
+    font-size: 16px;
+    transition: transform 0.2s ease;
+}
+
+.capture-accordion-toggle.active .capture-accordion-arrow {
+    transform: rotate(180deg);
+}
+
+/* Панель аккордеона (контент под заголовком) */
+.capture-accordion-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-out, opacity 0.2s ease;
+    opacity: 0;
+}
+
+.capture-accordion-panel.open {
+    max-height: 1000px;
+    opacity: 1;
+}
+
+/* ===== Формы и поля ввода ===== */
+
+.capture-form-group {
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.capture-form-group label {
+    display: block;
+    font-size: 16px;
+    color: #006D75;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+/* Сдвигаем рамку поля на 20px левее */
+.capture-form-group input,
+.capture-form-group textarea {
+    width: 160px;            /* уменьшили ширину */
+    padding: 8px 10px;
+    border: 1px solid #87E8DE;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    margin-left: 0;          /* убрали отрицательный отступ */
+}
+
+.capture-form-group input:focus,
+.capture-form-group textarea:focus {
+    outline: none;
+    border-color: #006D75;
+    box-shadow: 0 0 0 3px rgba(0, 109, 117, 0.2);
+}
+
+/* Строка кнопок в блоке параметров */
+.capture-buttons-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Кнопки управления (на базе твоей browse-button, но отдельный класс, чтобы не ломать общий стиль) */
+.capture-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    background: #006D75;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+}
+
+.capture-btn:hover:not(:disabled) {
+    background: #00474D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 109, 117, 0.3);
+}
+
+.capture-btn:disabled {
+    background: #bfbfbf;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* ===== Лог ===== */
+
+.capture-log-output {
+    height: 520px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #0f172a;
+    color: #e5e7eb;
+    font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
+    font-size: 13px;
+    padding: 10px 12px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    box-sizing: border-box;
+    transition: none; /* чтобы при аккордеоне лог не анимировался */
+}
+
+/* Каждая строка лога — просто div, но можно слегка уплотнить */
+.capture-log-output div {
+    margin-bottom: 2px;
+}
+
+/* ===== Адаптивность ===== */
+
+@media (max-width: 1024px) {
+    .capture-layout {
+        flex-direction: column;
+    }
+
+    .capture-log-output {
+        height: 300px;
+    }
+}
+
+@media (max-width: 600px) {
+    .capture-main {
+        margin-top: 100px;
+        padding: 0 10px;
+    }
+
+    .capture-buttons-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .capture-btn {
+        width: 100%;
+    }
+
+    .capture-left-column {
+    flex: 1 1 auto;
+    }
+
+    .capture-form-group input,
+    .capture-form-group textarea {
+        width: 100%;
+    }
+}
