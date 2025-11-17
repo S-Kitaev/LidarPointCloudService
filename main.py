@@ -9,6 +9,7 @@ from fastapi.exception_handlers import http_exception_handler as default_http_ha
 from fastapi.openapi.utils import get_openapi
 
 from app.api.v1.web import router as web_router
+from app.api.v1.lidar import router as lidar_router
 from app.db.base import Base
 from app.db.session import engine
 
@@ -79,3 +80,4 @@ async def auth_http_exception_handler(request: Request, exc: HTTPException):
 
 # Все ваши веб-роуты в одном месте
 app.include_router(web_router)
+app.include_router(lidar_router, prefix="/api/lidar")

@@ -16,4 +16,10 @@ class Settings(BaseSettings):
     JWT_PUBLIC_KEY_PATH:  str = str(BASE_DIR / "certs" / "jwt-public.pem")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # Lidar SSH
+    LIDAR_HOST: str = "192.168.0.101"
+    LIDAR_USER: str = "vr"
+    LIDAR_PASS: str = "vr"
+    LIDAR_REMOTE_PATH: str = "/home/vr/Desktop/lidar"
+
 settings = Settings()
