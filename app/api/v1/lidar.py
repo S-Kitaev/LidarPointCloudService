@@ -189,10 +189,14 @@ async def stop_scan(payload: dict = Body(...)):
 
 @router.get("/download")
 async def download(filename: str):
-    # скачиваем посредством SFTP на сервер и отдаем клиенту
-    tmp_dir = "/tmp" if os.name != "nt" else os.getenv("TEMP", ".")
+    # папка scans в корне проекта (два уровня вверх от этого файла)
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    scans_dir = os.path.join(project_root, "scans")
+    os.makedirs(scans_dir, exist_ok=True)  # на всякий случай создаём, если нет
+
     remote_path = f"{settings.LIDAR_REMOTE_PATH}/scans/{filename}"
-    local_path = os.path.join(tmp_dir, filename)
+    local_path = os.path.join(scans_dir, filename)
+
     try:
         ssh = _ssh_connect()
         sftp = ssh.open_sftp()
@@ -201,7 +205,7 @@ async def download(filename: str):
         ssh.close()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"SFTP failed: {e}")
-    # вернём файл
+
     return FileResponse(local_path, filename=filename)
 
 

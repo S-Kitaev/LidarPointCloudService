@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const connectionPanel = document.getElementById("connection-panel");
   const scanPanel = document.getElementById("scan-panel");
-  if (connectionPanel) connectionPanel.classList.add("open");
 
   const btnCheck = document.getElementById("btn-check-connection");
   const btnConnect = document.getElementById("btn-connect-ssh");
@@ -94,28 +93,50 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  async function openLogWs(taskId) {
-    if (ws) {
-      try { ws.close(); } catch(e){ }
-      ws = null;
-    }
-    const protocol = (location.protocol === "https:") ? "wss:" : "ws:";
-    const url = `${protocol}//${location.host}/api/lidar/ws/${taskId}`;
-    ws = new WebSocket(url);
-    ws.onopen = () => log(`[+] Подключен к логам (task ${taskId})`);
-    ws.onmessage = ev => {
-      try {
-        const obj = JSON.parse(ev.data);
-        if (obj.type === "out") log(obj.text);
-        else if (obj.type === "err") log("ERR: " + obj.text);
-        else if (obj.type === "info") log(obj.text);
-      } catch (e) {
-        log(ev.data);
+    async function openLogWs(taskId) {
+      if (ws) {
+        try { ws.close(); } catch (e) { }
+        ws = null;
       }
-    };
-    ws.onclose = () => log("[*] WebSocket логов закрыт");
-    ws.onerror = e => log("[!] WebSocket ошибка");
-  }
+      const protocol = (location.protocol === "https:") ? "wss:" : "ws:";
+      const url = `${protocol}//${location.host}/api/lidar/ws/${taskId}`;
+      ws = new WebSocket(url);
+
+      ws.onopen = () => log(`[+] Подключен к логам (task ${taskId})`);
+
+      ws.onmessage = ev => {
+        try {
+          const obj = JSON.parse(ev.data);
+          if (obj.type === "out") {
+            log(obj.text);
+          } else if (obj.type === "err") {
+            log("ERR: " + obj.text);
+          } else if (obj.type === "info") {
+            log(obj.text);
+
+            // Если команда завершена (нормально или с ошибкой) —
+            // стоп выключаем, старт включаем
+            if (obj.text.includes("Команда завершена") ||
+                obj.text.includes("Прервано пользователем")) {
+
+              if (btnStopScan) btnStopScan.disabled = true;
+              if (btnStartScan) btnStartScan.disabled = false;
+
+              // и если есть файл — даём возможность скачать
+              if (obj.text.includes("Команда завершена") &&
+                  currentFilename && btnDownload) {
+                btnDownload.disabled = false;
+              }
+            }
+          }
+        } catch (e) {
+          log(ev.data);
+        }
+      };
+
+      ws.onclose = () => log("[*] WebSocket логов закрыт");
+      ws.onerror = e => log("[!] WebSocket ошибка");
+    }
 
   btnLidarTest?.addEventListener("click", async () => {
     if (!isConnected) { log("[-] Нет подключения"); return; }
@@ -153,6 +174,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     btnStartScan.disabled = true;
     btnStopScan.disabled = false;
+    if (btnDownload) btnDownload.disabled = true;
+
     try {
       const resp = await postJson("/api/lidar/start", payload);
       if (resp.task_id) {
@@ -180,10 +203,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  btnDownload?.addEventListener("click", () => {
-    if (!currentFilename) return log("[-] Нет файла для скачивания");
-    // сделаем переход на эндпоинт скачивания
-    window.location = `/api/lidar/download?filename=${encodeURIComponent(currentFilename)}`;
-  });
+    btnDownload?.addEventListener("click", () => {
+      if (!currentFilename) return log("[-] Нет файла для скачивания");
+      window.location = `/api/lidar/download?filename=${encodeURIComponent(currentFilename)}`;
+      if (btnStartScan) btnStartScan.disabled = false;   // ← включаем повторные съёмки
+    });
 
 });
