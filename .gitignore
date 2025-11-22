@@ -1,2 +1,5 @@
-../certs/
+.venv
 .env
+
+certs/jwt-private.pem
+certs/jwt-public.pem
