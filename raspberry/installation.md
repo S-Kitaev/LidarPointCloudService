@@ -79,7 +79,7 @@ sudo systemctl status ssh --no-pager
 sudo reboot
 ```
 ---
-## 6. Проверка подключения по SSH
+## 6. Проверка подключения по SSH c хоста
 Подключаемся:
 
 ```bash
