@@ -35,7 +35,7 @@ HES LiDAR project
 
 - Техническое задание - [docs/тз v1(22_03_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/%D1%82%D0%B7%20v1(22_03_25).md)
 - Функциональные и нефункциональные требования - [docs/фтт нфтт v1(22_03_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/%D1%84%D1%82%D1%82%20%D0%BD%D1%84%D1%82%D1%82%20v1(22_03_25).md)
-- Концептуальный проект** - [docs/концептуальный проект v1(01_01_2024).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/%D0%BA%D0%BE%D0%BD%D1%86%D0%B5%D0%BF%D1%82%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%20v1(01_01_2024).md)
+- Концептуальный проект - [docs/концептуальный проект v1(01_01_2024).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/%D0%BA%D0%BE%D0%BD%D1%86%D0%B5%D0%BF%D1%82%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%20v1(01_01_2024).md)
 - Обоснование выбора технологий - [docs/обоснования проекта v1(07_12_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/%D0%BE%D0%B1%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B0%20v1(07_12_25).md)
 - Ролевая модель первой фазы проекта - [docs/ролевая модель v1(10_05_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/%D1%80%D0%BE%D0%BB%D0%B5%D0%B2%D0%B0%D1%8F%20%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D1%8C%20v1(10_05_25).md)
 - Ролевая модель второй фазы проекта - ```---```
