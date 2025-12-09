@@ -1,10 +1,14 @@
-// Функция для преобразования сферических координат в декартовы (в метрах)
-function sphericalToCartesian(phi, r, theta) {
-    const x = r * Math.sin(theta*Math.PI/180) * Math.cos(phi*Math.PI/180);
-    const y = r * Math.sin(theta*Math.PI/180) * Math.sin(phi*Math.PI/180);
-    const z = r * Math.cos(theta*Math.PI/180);
+function polarToCartesianWithRotation(phi, r, theta) {
+    const alpha = (120 - theta) * Math.PI / 180;
+    const phiRad = phi * Math.PI / 180;
+
+    const x = r * Math.cos(phiRad) * Math.cos(alpha) - 100 * Math.sin(alpha);
+    const y = r * Math.sin(phiRad);
+    const z = -r * Math.cos(phiRad) * Math.sin(alpha) - 100 * Math.cos(alpha);
+
     return { x: x / 1000, y: y / 1000, z: z / 1000 };
 }
+
 
 // Функция для создания текстовой подписи (Sprite)
 function makeTextSprite(message, color = "#222", fontSize = 120) {
@@ -63,7 +67,7 @@ function createPointCloudVisualization(coordinates, containerId) {
     // Преобразуем координаты
     const positions = [];
     coordinates.forEach(coord => {
-        const { x, y, z } = sphericalToCartesian(coord.phi, coord.r, coord.theta);
+        const { x, y, z } = polarToCartesianWithRotation(coord.phi, coord.r, coord.theta);
         positions.push(x, y, z);
     });
     const geometry = new THREE.BufferGeometry();
