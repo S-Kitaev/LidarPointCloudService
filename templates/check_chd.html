@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Просмотр облака (ЦХД)</title>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  <link rel="stylesheet" href="/static/css/chd.css"/>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo-white"></div>
+    <nav class="main-nav">
+      <a href="/{{ user_id }}" class="nav-item">Главная</a>
+      <a href="/{{ user_id }}/create" class="nav-item">Создание облака точек</a>
+      <a href="/{{ user_id }}/check" class="nav-item">Просмотр облака точек</a>
+      <a href="/{{ user_id }}/chd" class="nav-item active">ЦХД</a>
+      <a href="/{{ user_id }}/capture" class="nav-item">Снять облако точек</a>
+    </nav>
+    <div class="user-section">
+      <span class="user-name">{{ username }}</span>
+      <div class="user-icon"></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="experiments-container">
+
+      <div class="page-header">
+        <div class="page-title-center">
+          <h1>Выберите эксперимент для просмотра</h1>
+        </div>
+        <button class="sync-button" onclick="syncWithCHD({{ user_id }})">
+            Синхронизировать
+        </button>
+      </div>
+
+      <div id="experiments-list">
+      </div>
+
+      <div id="connection-error" class="connection-error hidden">
+        <div class="connection-panel">
+          <p class="connection-message">Не удается получить эксперименты из ЦХД</p>
+          <button id="retry-button" class="retry-button">Повторить</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const userId = {{ user_id }};
+
+    function viewExperiment(userId, experimentId) {
+      window.location.href = `/${userId}/chd/${experimentId}?source=chd`;
+    }
+
+    async function syncWithCHD(userId) {
+      const btn = document.querySelector('.sync-button');
+      const originalText = btn.innerText;
+
+      btn.disabled = true;
+      btn.innerText = "Синхронизация...";
+      btn.style.opacity = "0.7";
+      btn.style.cursor = "wait";
+
+      try {
+        const response = await fetch(`/${userId}/chd/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            btn.style.opacity = "1";
+            btn.innerText = "✔ Успешно";
+            btn.style.background = "#28a745";
+            btn.style.color = "#ffffff";
+            btn.style.border = "2px solid #28a745";
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            alert("Ошибка: " + (result.message || "Неизвестная ошибка"));
+        }
+      } catch (error) {
+        console.error('Ошибка:', error);
+        alert("Ошибка соединения с сервером.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+      }
+    }
+
+    async function loadExperiments() {
+      const listEl = document.getElementById('experiments-list');
+      const errEl = document.getElementById('connection-error');
+
+      listEl.innerHTML = '<p class="loading-text">Загрузка экспериментов...</p>';
+      errEl.classList.add('hidden');
+
+      try {
+        const resp = await fetch(`/${userId}/chd/experiments`, { method: 'GET' });
+        if (!resp.ok) {
+          throw new Error('Server error');
+        }
+        const data = await resp.json();
+        if (!data.ok) {
+          throw new Error(data.message || 'Не удалось получить данные');
+        }
+
+        const experiments = data.experiments || [];
+
+        if (experiments.length === 0) {
+          listEl.innerHTML = `
+            <div class="no-experiments">
+              <p>Пока нет доступных экспериментов в ЦХД.</p>
+              <p>Попробуйте синхронизировать данные.</p>
+            </div>
+          `;
+          return;
+        }
+
+        listEl.innerHTML = '';
+        experiments.forEach(exp => {
+          const card = document.createElement('div');
+          card.className = 'experiment-card';
+          card.addEventListener('click', () => viewExperiment(userId, exp.id));
+
+          card.innerHTML = `
+            <div class="experiment-header">
+              <span class="experiment-id">ID: ${exp.id}</span>
+              <span class="experiment-date">${exp.exp_dt || 'Дата не указана'}</span>
+            </div>
+            <div class="experiment-details">
+              <div class="detail-item">
+                <div class="detail-label">Описание помещения:</div>
+                <div class="detail-value">${escapeHtml(exp.room_description || 'Не указано')}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Адрес:</div>
+                <div class="detail-value">${escapeHtml(exp.address || '')}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Описание объекта:</div>
+                <div class="detail-value">${escapeHtml(exp.object_description || 'Не указано')}</div>
+              </div>
+            </div>
+            <button class="view-button" onclick="event.stopPropagation(); viewExperiment(${userId}, ${exp.id})">
+              Просмотреть облако точек
+            </button>
+          `;
+          listEl.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error('Fetch experiments error:', err);
+        listEl.innerHTML = '';
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/[&<>"']/g, function(m) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadExperiments();
+      const retryBtn = document.getElementById('retry-button');
+      retryBtn && retryBtn.addEventListener('click', () => {
+        loadExperiments();
+      });
+    });
+
+  </script>
+</body>
+</html>

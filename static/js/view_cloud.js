@@ -233,10 +233,12 @@ function loadVisualization(userId, experimentId) {
     const loading = document.getElementById('loading');
     const error = document.getElementById('error');
     const visualization = document.getElementById('visualization');
+    const urlParams = new URLSearchParams(window.location.search);
+    const source = urlParams.get('source') || 'local'; 
     loading.style.display = 'flex';
     error.style.display = 'none';
     visualization.innerHTML = '';
-    fetch(`/${userId}/api/experiments/${experimentId}/measurements`)
+    fetch(`/${userId}/api/experiments/${experimentId}/measurements?source=${source}`)
         .then(response => {
             if (!response.ok) throw new Error('Ошибка загрузки данных');
             return response.json();

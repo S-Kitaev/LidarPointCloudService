@@ -7,7 +7,7 @@ def get_user_by_name(db: Session, user_name: str):
     return db.query(User).filter(User.user_name == user_name).first()
 
 def get_user_by_id(db, user_id: int):
-    return db.query(User).filter(User.user_id == user_id).first()
+    return db.query(User).filter(User.id == user_id).first()
 
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()

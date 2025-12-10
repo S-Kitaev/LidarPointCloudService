@@ -115,8 +115,18 @@
     </a>
     <nav class="main-nav">
       <a href="/{{ user_id }}/create" class="nav-item">Создание облака точек</a>
-      <a href="/{{ user_id }}/check" class="nav-item active">Просмотр облака точек</a>
-      <a href="/{{ user_id }}/connect" class="nav-item">Подключение к ЦХД</a>
+    <!-- Проверяем active_page == 'check' -->
+      <a href="/{{ user_id }}/check" 
+        class="nav-item {% if active_page == 'check' %}active{% endif %}">
+        Просмотр облака точек
+      </a>
+      
+      <!-- Проверяем active_page == 'chd' -->
+      <a href="/{{ user_id }}/chd" 
+        class="nav-item {% if active_page == 'chd' %}active{% endif %}">
+        ЦХД
+      </a>
+      <a href="/{{ user_id }}/capture" class="nav-item">Снять облако точек</a>
     </nav>
     <div class="user-section">
       <span class="user-name">{{ username }}</span>
@@ -186,7 +196,16 @@
     });
     
     function goBack() {
-      window.location.href = '/{{ user_id }}/check';
+      const userId = '{{ user_id }}';
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const source = urlParams.get('source');
+
+      if (source === 'chd') {
+        window.location.href = `/${userId}/chd`;
+      } else {
+        window.location.href = `/${userId}/check`;
+      }
     }
   </script>
 </body>

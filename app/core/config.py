@@ -11,7 +11,6 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
-    DATABASE_URL: str
     JWT_PRIVATE_KEY_PATH: str = str(BASE_DIR / "certs" / "jwt-private.pem")
     JWT_PUBLIC_KEY_PATH:  str = str(BASE_DIR / "certs" / "jwt-public.pem")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
@@ -21,5 +20,23 @@ class Settings(BaseSettings):
     LIDAR_USER: str = "vr"
     LIDAR_PASS: str = "vr"
     LIDAR_REMOTE_PATH: str = "/home/vr/Desktop/lidar"
+
+    DATABASE_URL: str
+    
+    CHD_HOST: str
+    CHD_PORT: str = "5432"  
+    CHD_USER: str
+    CHD_PASS: str
+    CHD_NAME: str
+
+
+    @property
+    def CHD_URL(self) -> str:
+        encoded_pass = self.CHD_PASS
+        
+        return (
+            f"postgresql://{self.CHD_USER}:{encoded_pass}"
+            f"@{self.CHD_HOST}:{self.CHD_PORT}/{self.CHD_NAME}"
+        )
 
 settings = Settings()

@@ -2,7 +2,7 @@ import pathlib
 
 from pydantic import ValidationError
 from fastapi import (
-    APIRouter, Request, Depends, Form, Cookie, HTTPException, Header, Path, UploadFile, File
+    APIRouter, Request, Depends, Form, Cookie, HTTPException, Header, Path, UploadFile, File, Query,
 )
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -11,13 +11,13 @@ from starlette import status
 from app.crud.user import (
     get_user_by_name, get_user_by_id, get_user_by_email, create_user
 )
-from app.crud.experiment import insert_experiment, get_all_experiments, get_experiment_by_id
+from app.crud.experiment import insert_experiment, get_all_experiments_async, get_experiment_by_id, insert_local_experiments_to_chd
 from app.crud.measurement import insert_measurements, get_measurements_by_experiment_id
 from app.schemas.user import UserCreate
 from app.schemas.experiment import ExperimentCreate
 from app.schemas.measurement import MeasurementCreate, MeasurementData
 from app.core.security import verify_password, create_access_token, decode_access_token
-from app.db.session import get_db
+from app.db.session import get_db, get_chd
 from app.core.config import settings
 from sqlalchemy.exc import SQLAlchemyError
 import json
@@ -132,8 +132,8 @@ async def login_web(
             "login.html", {"request": request, "error": "Неправильные учётные данные"}
         )
 
-    token = create_access_token({"sub": str(user.user_id)})
-    resp = RedirectResponse(f"/{user.user_id}", status_code=status.HTTP_303_SEE_OTHER)
+    token = create_access_token({"sub": str(user.id)})
+    resp = RedirectResponse(f"/{user.id}", status_code=status.HTTP_303_SEE_OTHER)
     resp.set_cookie(
         "Authorization", f"Bearer {token}",
         httponly=True, secure=False, samesite="lax",
@@ -147,7 +147,7 @@ async def login_web(
 async def home_user(request: Request, user=Depends(require_authenticated_user)):
     return templates.TemplateResponse(
         "home_main.html",
-        {"request": request, "username": user.user_name, "user_id": user.user_id}
+        {"request": request, "username": user.user_name, "user_id": user.id}
     )
 
 
@@ -155,17 +155,25 @@ async def home_user(request: Request, user=Depends(require_authenticated_user)):
 async def create_cloud(request: Request, user=Depends(require_authenticated_user)):
     return templates.TemplateResponse(
         "create.html",
-        {"request": request, "username": user.user_name, "user_id": user.user_id}
+        {"request": request, "username": user.user_name, "user_id": user.id}
     )
 
 
 @router.get("/{user_id}/check", response_class=HTMLResponse)
-async def check_cloud(request: Request, user=Depends(require_authenticated_user), db=Depends(get_db)):
+async def check_cloud(
+    request: Request, 
+    user=Depends(require_authenticated_user)
+    ):
     """Страница выбора эксперимента для просмотра"""
-    experiments = get_all_experiments(db)
+    try:
+        experiments = await get_all_experiments_async()
+    except TimeoutError as e:
+        return JSONResponse(status_code=408, content={"ok": False, "message": "Не удается получить эксперименты"})
+    except Exception as exc:
+        experiments = []
     return templates.TemplateResponse(
         "check.html",
-        {"request": request, "username": user.user_name, "user_id": user.user_id, "experiments": experiments}
+        {"request": request, "username": user.user_name, "user_id": user.id, "experiments": experiments}
     )
 
 
@@ -186,9 +194,78 @@ async def view_cloud(
         {
             "request": request, 
             "username": user.user_name, 
-            "user_id": user.user_id, 
+            "user_id": user.id, 
             "experiment": experiment,
-            "experiment_id": experiment_id
+            "experiment_id": experiment_id,
+             "active_page": "check"
+        }
+    )
+
+@router.get("/{user_id}/chd", response_class=HTMLResponse)
+async def check_chd_cloud(
+    request: Request,
+    user=Depends(require_authenticated_user),
+):
+    """
+    Всегда рендерим check_chd.html. Список экспериментов запрашивается
+    отдельным AJAX-запросом к /{user_id}/chd/experiments
+    """
+    return templates.TemplateResponse(
+        "check_chd.html",
+        {
+            "request": request,
+            "username": user.user_name,
+            "user_id": user.id
+        }
+    )
+
+@router.get("/{user_id}/chd/experiments", response_class=JSONResponse)
+async def chd_get_experiments_api(
+    request: Request,
+    user=Depends(require_authenticated_user)
+):
+    try:
+        experiments = await get_all_experiments_async(user_id=user.id, is_global_db=True)
+
+        result = [
+            {
+                "id": e.id,
+                "exp_dt": (e.exp_dt.strftime('%d.%m.%Y %H:%M') if getattr(e, "exp_dt", None) else None),
+                "room_description": e.room_description or "",
+                "address": e.address or "",
+                "object_description": e.object_description or "",
+            }
+            for e in (experiments or [])
+        ]
+
+        return JSONResponse(status_code=200, content={"ok": True, "experiments": result})
+    except TimeoutError as e:
+        return JSONResponse(status_code=408, content={"ok": False, "message": "Не удается получить эксперименты из ЦХД"})
+    except Exception:
+        return JSONResponse(status_code=503, content={"ok": False, "message": "Не удается получить эксперименты из ЦХД"})
+
+
+@router.get("/{user_id}/chd/{experiment_id}", response_class=HTMLResponse)
+async def view_chd_cloud(
+    request: Request, 
+    experiment_id: int, 
+    user=Depends(require_authenticated_user), 
+    db=Depends(get_chd)
+):
+    """Страница просмотра облака точек для конкретного эксперимента"""
+    experiment = get_experiment_by_id(db, experiment_id)
+    if not experiment:
+        raise HTTPException(status_code=404, detail="Эксперимент не найден")
+    
+    return templates.TemplateResponse(
+        "view_cloud.html",
+        {
+            "request": request, 
+            "username": user.user_name, 
+            "user_id": user.id, 
+            "experiment": experiment,
+            "experiment_id": experiment_id,
+            "active_page": "chd"    
         }
     )
 
@@ -212,15 +289,24 @@ async def get_experiments_api(user=Depends(require_authenticated_user), db=Depen
 @router.get("/{user_id}/api/experiments/{experiment_id}/measurements")
 async def get_measurements_api(
     experiment_id: int, 
-    user=Depends(require_authenticated_user), 
-    db=Depends(get_db)
+    source: str = Query("local"), # Читаем параметр ?source=... (по дефолту local)
+    user=Depends(require_authenticated_user),
+    local_db=Depends(get_db),
+    global_db=Depends(get_chd)
 ):
     """API для получения измерений эксперимента в сферических координатах"""
-    experiment = get_experiment_by_id(db, experiment_id)
+
+    if source == "chd":
+        current_db = global_db
+    else:
+        current_db = local_db
+
+
+    experiment = get_experiment_by_id(current_db, experiment_id)
     if not experiment:
         raise HTTPException(status_code=404, detail="Эксперимент не найден")
     
-    measurements = get_measurements_by_experiment_id(db, experiment_id)
+    measurements = get_measurements_by_experiment_id(current_db, experiment_id)
     
     if not measurements:
         raise HTTPException(status_code=404, detail="Измерения не найдены")
@@ -254,6 +340,7 @@ async def insert_data(
         address: str = Form(...),
         object_description: str = Form(...),
         measurements_file: UploadFile = File(...),
+        user=Depends(require_authenticated_user),
         db=Depends(get_db),
 ):
     try:
@@ -262,8 +349,8 @@ async def insert_data(
         experiment = ExperimentCreate(exp_dt=date,
                                       room_description=room_description,
                                       address=address,
-                                      object_description=object_description)
-
+                                      object_description=object_description,
+                                      user_id=user.id)
         exp_id = insert_experiment(db=db, experiment=experiment)
         measurement_create = MeasurementCreate(
             measurements=[MeasurementData(**item) for item in measurements_dict["measurements"]]
@@ -280,18 +367,26 @@ async def insert_data(
         db.close()
 
 
-@router.get("/{user_id}/connect", response_class=HTMLResponse)
-async def connect_cxd(request: Request, user=Depends(require_authenticated_user)):
-    return templates.TemplateResponse(
-        "connect.html",
-        {"request": request, "username": user.user_name, "user_id": user.user_id}
-    )
+@router.post("/{user_id}/chd/save")
+async def synchronize_local_with_global_db(
+        user=Depends(require_authenticated_user)
+):
+    try:
+        await insert_local_experiments_to_chd()
+        return {"status": "success", "message": "Data inserted"}
+    except TimeoutError as e:
+        return {"status": "error", "message": str(e)}
+    except SQLAlchemyError as e:
+        return {"status": "error", "message": f"Database error: {str(e)}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 
 @router.get("/{user_id}/capture", response_class=HTMLResponse)
 async def connect_cxd(request: Request, user=Depends(require_authenticated_user)):
     return templates.TemplateResponse(
         "capture.html",
-        {"request": request, "username": user.user_name, "user_id": user.user_id})
+        {"request": request, "username": user.user_name, "user_id": user.id})
 
 @router.get("/{user_id}/docs/specs", response_class=HTMLResponse)
 async def docs_specs(request: Request, user=Depends(require_authenticated_user)):
