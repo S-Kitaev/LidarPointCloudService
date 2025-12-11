@@ -2,9 +2,10 @@ function polarToCartesianWithRotation(phi, r, theta) {
     const alpha = (120 - theta) * Math.PI / 180;
     const phiRad = phi * Math.PI / 180;
 
-    const x = r * Math.cos(phiRad) * Math.cos(alpha) - 100 * Math.sin(alpha);
-    const y = r * Math.sin(phiRad);
-    const z = -r * Math.cos(phiRad) * Math.sin(alpha) - 100 * Math.cos(alpha);
+    // Преобразование осей: y->x, x->z, z->y
+    const x = r * Math.sin(phiRad);
+    const y = -r * Math.cos(phiRad) * Math.sin(alpha) - 100 * Math.cos(alpha);
+    const z = -(r * Math.cos(phiRad) * Math.cos(alpha) - 100 * Math.sin(alpha));
 
     return { x: x / 1000, y: y / 1000, z: z / 1000 };
 }
@@ -21,7 +22,7 @@ function makeTextSprite(message, color = "#222", fontSize = 120) {
     const texture = new THREE.CanvasTexture(canvas);
     const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
     const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.scale.set(fontSize * 0.012, fontSize * 0.006, 1); // Пропорционально fontSize
+    sprite.scale.set(fontSize * 0.012, fontSize * 0.006, 1);
     return sprite;
 }
 
@@ -29,15 +30,14 @@ function addAxisLabels(scene, axis, min, max, step, fixed = 0) {
     for (let v = Math.ceil(min / step) * step; v <= max; v += step) {
         let pos = { x: 0, y: 0, z: 0 };
         pos[axis] = v;
-        // подпись
         const label = makeTextSprite(v.toFixed(fixed), "#444", 120);
-        // немного смещаем подписи от оси
+        // Смещаем подписи от оси
         if (axis === "x") {
-            label.position.set(v, min, min);
+            label.position.set(v, min - 0.3, min - 0.3);
         } else if (axis === "y") {
-            label.position.set(min, v, min);
+            label.position.set(min - 0.3, v, min - 0.3);
         } else if (axis === "z") {
-            label.position.set(min, min, v);
+            label.position.set(min - 0.3, min - 0.3, v);
         }
         scene.add(label);
     }
@@ -59,7 +59,7 @@ function createPointCloudVisualization(coordinates, containerId) {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf8f9fa);
     const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 10000);
-    camera.position.set(0, 0, 10);
+    camera.position.set(5, 5, 5);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     container.appendChild(renderer.domElement);
@@ -85,36 +85,52 @@ function createPointCloudVisualization(coordinates, containerId) {
     const bbox = geometry.boundingBox;
     const min = bbox.min, max = bbox.max;
 
-    // Оси
+    // Оси координат (красная=X, зеленая=Y, синяя=Z в Three.js)
     const axesHelper = new THREE.AxesHelper(Math.max(max.x - min.x, max.y - min.y, max.z - min.z) * 0.6);
     scene.add(axesHelper);
 
-    // Сетка по каждой оси (в метрах)
+    // Создаем три плоскости-сетки
     const gridSizeX = Math.ceil(max.x - min.x);
     const gridSizeY = Math.ceil(max.y - min.y);
     const gridSizeZ = Math.ceil(max.z - min.z);
-    const gridXY = new THREE.GridHelper(gridSizeX, Math.max(2, Math.round(gridSizeX)), 0x888888, 0xcccccc);
-    gridXY.rotation.x = Math.PI / 2;
+
+    // Плоскость XY (параллельна экрану при виде спереди, перпендикулярна Z)
+    const sizeXY = Math.max(gridSizeX, gridSizeY);
+    const gridXY = new THREE.GridHelper(sizeXY, Math.max(10, Math.round(sizeXY * 2)), 0x888888, 0xcccccc);
+    gridXY.rotation.x = Math.PI / 2; // Поворачиваем в плоскость XY
     gridXY.position.set(0, 0, min.z);
     scene.add(gridXY);
-    const gridYZ = new THREE.GridHelper(gridSizeY, Math.max(2, Math.round(gridSizeY)), 0x888888, 0xcccccc);
-    gridYZ.rotation.z = Math.PI / 2;
-    gridYZ.position.set(min.x, 0, 0);
-    scene.add(gridYZ);
-    const gridXZ = new THREE.GridHelper(gridSizeZ, Math.max(2, Math.round(gridSizeZ)), 0x888888, 0xcccccc);
+
+    // Плоскость XZ (горизонтальная, перпендикулярна Y)
+    const sizeXZ = Math.max(gridSizeX, gridSizeZ);
+    const gridXZ = new THREE.GridHelper(sizeXZ, Math.max(10, Math.round(sizeXZ * 2)), 0x888888, 0xcccccc);
     gridXZ.position.set(0, min.y, 0);
     scene.add(gridXZ);
 
-    // Подписи осей (X, Y, Z)
-    const xLabel = makeTextSprite("X, м", "#222", 130);
-    xLabel.position.set(max.x, min.y, min.z);
-    scene.add(xLabel);
-    const yLabel = makeTextSprite("Y, м", "#222", 130);
-    yLabel.position.set(min.x, max.y, min.z);
-    scene.add(yLabel);
-    const zLabel = makeTextSprite("Z, м", "#222", 130);
-    zLabel.position.set(min.x, min.y, max.z);
-    scene.add(zLabel);
+    // Плоскость YZ (вертикальная боковая, перпендикулярна X)
+    const sizeYZ = Math.max(gridSizeY, gridSizeZ);
+    const gridYZ = new THREE.GridHelper(sizeYZ, Math.max(10, Math.round(sizeYZ * 2)), 0x888888, 0xcccccc);
+    gridYZ.rotation.z = Math.PI / 2; // Поворачиваем в плоскость YZ
+    gridYZ.position.set(min.x, 0, 0);
+    scene.add(gridYZ);
+
+    // Подписи осей (с учетом преобразования координат)
+    const offset = 0.5;
+
+    // По оси X в Three.js отложен старый Y, поэтому подпись "Y, м"
+    const labelY = makeTextSprite("Y, м", "#222", 150);
+    labelY.position.set(max.x + offset, min.y, min.z);
+    scene.add(labelY);
+
+    // По оси Y в Three.js отложен старый Z, поэтому подпись "Z, м"
+    const labelZ = makeTextSprite("Z, м", "#222", 150);
+    labelZ.position.set(min.x, max.y + offset, min.z);
+    scene.add(labelZ);
+
+    // По оси Z в Three.js отложен старый X, поэтому подпись "X, м"
+    const labelX = makeTextSprite("X, м", "#222", 150);
+    labelX.position.set(min.x, min.y, max.z + offset);
+    scene.add(labelX);
 
     // Деления с числами (метки) на осях
     const stepX = Math.max(1, Math.round((max.x - min.x) / 6));
@@ -146,11 +162,11 @@ function createPointCloudVisualization(coordinates, containerId) {
         const intersects = raycaster.intersectObject(points);
         if (intersects.length > 0) {
             const idx = intersects[0].index * 3;
-            const x = positions[idx].toFixed(2);
-            const y = positions[idx + 1].toFixed(2);
-            const z = positions[idx + 2].toFixed(2);
-            tooltip.innerHTML = `X=${x} м<br>Y=${y} м<br>Z=${z} м`;
-            // Позиционирование tooltip: не выходить за пределы окна
+            const threeX = positions[idx].toFixed(2);      // Three.js X (наш старый Y)
+            const threeY = positions[idx + 1].toFixed(2);  // Three.js Y (наш старый Z)
+            const threeZ = positions[idx + 2].toFixed(2);  // Three.js Z (наш старый X)
+            // Выводим в оригинальном порядке: X, Y, Z
+            tooltip.innerHTML = `X=${threeZ} м<br>Y=${threeX} м<br>Z=${threeY} м`;
             let left = event.clientX + 10;
             let top = event.clientY - 10;
             const pad = 10;
