@@ -203,15 +203,11 @@ async def view_cloud(
         }
     )
 
-@router.get("/{user_id}/chd", response_class=HTMLResponse)
+@router.get("/{user_id}/connect", response_class=HTMLResponse)
 async def check_chd_cloud(
     request: Request,
     user=Depends(require_authenticated_user),
 ):
-    """
-    Всегда рендерим check_chd.html. Список экспериментов запрашивается
-    отдельным AJAX-запросом к /{user_id}/chd/experiments
-    """
     return templates.TemplateResponse(
         "check_chd.html",
         {
@@ -221,7 +217,7 @@ async def check_chd_cloud(
         }
     )
 
-@router.get("/{user_id}/chd/experiments", response_class=JSONResponse)
+@router.get("/{user_id}/connect/experiments", response_class=JSONResponse)
 async def chd_get_experiments_api(
     request: Request,
     user=Depends(require_authenticated_user)
@@ -247,7 +243,7 @@ async def chd_get_experiments_api(
         return JSONResponse(status_code=503, content={"ok": False, "message": "Не удается получить эксперименты из ЦХД"})
 
 
-@router.get("/{user_id}/chd/experiments/{experiment_id}", response_class=HTMLResponse)
+@router.get("/{user_id}/connect/experiments/{experiment_id}", response_class=HTMLResponse)
 async def view_chd_cloud(
     request: Request, 
     experiment_id: int, 
@@ -269,7 +265,7 @@ async def view_chd_cloud(
             "user_id": user.id, 
             "experiment": experiment,
             "experiment_id": experiment_id,
-            "active_page": "chd"    
+            "active_page": "connect"    
         }
     )
 
@@ -354,7 +350,7 @@ async def insert_data(
         db.close()
 
 
-@router.post("/{user_id}/chd/save")
+@router.post("/{user_id}/connect/save")
 async def synchronize_local_with_global_db(
         user=Depends(require_authenticated_user)
 ):
@@ -379,14 +375,14 @@ async def connect_cxd(request: Request, user=Depends(require_authenticated_user)
 async def docs_specs(request: Request, user=Depends(require_authenticated_user)):
     return templates.TemplateResponse(
         "docs_specs.html",
-        {"request": request, "username": user.user_name, "user_id": user.user_id}
+        {"request": request, "username": user.user_name, "user_id": user.id}
     )
 
 @router.get("/{user_id}/docs/setup", response_class=HTMLResponse)
 async def docs_specs(request: Request, user=Depends(require_authenticated_user)):
     return templates.TemplateResponse(
         "docs_setup.html",
-        {"request": request, "username": user.user_name, "user_id": user.user_id}
+        {"request": request, "username": user.user_name, "user_id": user.id}
     )
 
 def render_md_to_html(md_content: str) -> str:
@@ -412,7 +408,7 @@ async def documentation_page(
     # Ищем локальный .md файл
     md_path = DOCS_DIR / f"{doc_name}.md"
     if not md_path.exists():
-        md_content = f"# Документация '{doc_name}' не найдена\n\nПопробуйте [вернуться на главную страницу](/{user.user_id})."
+        md_content = f"# Документация '{doc_name}' не найдена\n\nПопробуйте [вернуться на главную страницу](/{user.id})."
         source_info = ""
     else:
         md_content = md_path.read_text(encoding="utf-8")
@@ -426,7 +422,7 @@ async def documentation_page(
         {
             "request": request,
             "username": user.user_name,
-            "user_id": user.user_id,
+            "user_id": user.id,
             "doc_title": doc_name.replace("-", " ").replace("_", " ").title(),
             "doc_html": html_content,
             "source_info": source_info,

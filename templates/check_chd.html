@@ -9,12 +9,13 @@
 </head>
 <body>
   <header class="main-header">
-    <div class="logo-white"></div>
+    <a href="/{{ user_id }}" class="logo-link">
+      <div class="logo-white"></div>
+    </a>
     <nav class="main-nav">
-      <a href="/{{ user_id }}" class="nav-item">Главная</a>
       <a href="/{{ user_id }}/create" class="nav-item">Создание облака точек</a>
       <a href="/{{ user_id }}/check" class="nav-item">Просмотр облака точек</a>
-      <a href="/{{ user_id }}/chd" class="nav-item active">ЦХД</a>
+      <a href="/{{ user_id }}/connect" class="nav-item active">ЦХД</a>
       <a href="/{{ user_id }}/capture" class="nav-item">Снять облако точек</a>
     </nav>
     <div class="user-section">
@@ -52,7 +53,7 @@
     const userId = {{ user_id }};
 
     function viewExperiment(userId, experimentId) {
-      window.location.href = `/${userId}/chd/experiments/${experimentId}?source=chd`;
+      window.location.href = `/${userId}/connect/experiments/${experimentId}?source=chd`;
     }
 
     async function syncWithCHD(userId) {
@@ -65,7 +66,7 @@
       btn.style.cursor = "wait";
 
       try {
-        const response = await fetch(`/${userId}/chd/save`, {
+        const response = await fetch(`/${userId}/connect/save`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -101,7 +102,7 @@
       errEl.classList.add('hidden');
 
       try {
-        const resp = await fetch(`/${userId}/chd/experiments`, { method: 'GET' });
+        const resp = await fetch(`/${userId}/connect/experiments`, { method: 'GET' });
         if (!resp.ok) {
           throw new Error('Server error');
         }
