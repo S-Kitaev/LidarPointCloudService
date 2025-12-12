@@ -45,7 +45,8 @@ def insert_local_experiments_sync():
                 if not g_user:
                     g_user = User(
                         user_name=l_user.user_name,
-                        email=l_user.email
+                        email=l_user.email,
+                        user_password=l_user.user_password
                     )
                     global_db.add(g_user)
                     global_db.flush() 
@@ -127,7 +128,7 @@ async def insert_local_experiments_to_chd():
     try:
         await asyncio.wait_for(
             asyncio.to_thread(insert_local_experiments_sync),
-            timeout=20.0
+            timeout=60.0
         )
     except asyncio.TimeoutError:
         print("Синхронизация прервана по таймауту.")
@@ -182,7 +183,7 @@ async def get_all_experiments_async(user_id: int=None, is_global_db: bool=False)
     try:
         return await asyncio.wait_for(
             asyncio.to_thread(get_all_experiments, user_id, is_global_db),
-            timeout=5.0
+            timeout=10.0
         )
     except asyncio.TimeoutError:
         print("Получение экспериментов прервано по таймауту.")
