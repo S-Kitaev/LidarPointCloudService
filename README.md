@@ -29,7 +29,7 @@ HES LiDAR project
 - Руководство по запуску ПО - [docs/запуск по v1(07_12_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%20%D0%BF%D0%BE%20v1(07_12_25).md)
 - Руководство по сборке установки - [raspberry/build.md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/raspberry/build.md)
 - Руководство загрузки ПО установки - [raspberry/installation.md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/raspberry/installation.md)
-- API - [docs/api v1(07_12_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/api%20v1(07_12_25).md)
+- API - [docs/api v1(12_12_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/api%20v1(12_12_25).md)
 
 ### Отчетные документы
 
