@@ -8,9 +8,10 @@
 </head>
 <body>
   <header class="main-header">
-    <div class="logo-white"></div>
+    <a href="/{{ user_id }}" class="logo-link">
+      <div class="logo-white"></div>
+    </a>
     <nav class="main-nav">
-      <a href="/{{ user_id }}" class="nav-item">Главная</a>
       <a href="/{{ user_id }}/create" class="nav-item">Создание облака точек</a>
       <a href="/{{ user_id }}/check" class="nav-item">Просмотр облака точек</a>
       <a href="/{{ user_id }}/connect" class="nav-item active">Подключение к ЦХД</a>

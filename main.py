@@ -18,6 +18,9 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Lidar API")
 
+#Чтобы читались картинки из .md файлов
+DOCS_DIR = Path(__file__).parent / "docs"
+app.mount("/docs", StaticFiles(directory=DOCS_DIR), name="docs")
 
 def custom_openapi():
     if app.openapi_schema:

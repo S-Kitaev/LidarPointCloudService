@@ -22,7 +22,12 @@ from app.core.config import settings
 from sqlalchemy.exc import SQLAlchemyError
 import json
 
+import markdown
+
 router = APIRouter()
+
+# где лежат документы
+DOCS_DIR = pathlib.Path(__file__).resolve().parents[3] / "docs"
 
 # где лежат ваши html-шаблоны
 TEMPLATES_DIR = pathlib.Path(__file__).resolve().parents[3] / "templates"
@@ -288,3 +293,60 @@ async def connect_cxd(request: Request, user=Depends(require_authenticated_user)
         "capture.html",
         {"request": request, "username": user.user_name, "user_id": user.user_id})
 
+@router.get("/{user_id}/docs/specs", response_class=HTMLResponse)
+async def docs_specs(request: Request, user=Depends(require_authenticated_user)):
+    return templates.TemplateResponse(
+        "docs_specs.html",
+        {"request": request, "username": user.user_name, "user_id": user.user_id}
+    )
+
+@router.get("/{user_id}/docs/setup", response_class=HTMLResponse)
+async def docs_specs(request: Request, user=Depends(require_authenticated_user)):
+    return templates.TemplateResponse(
+        "docs_setup.html",
+        {"request": request, "username": user.user_name, "user_id": user.user_id}
+    )
+
+def render_md_to_html(md_content: str) -> str:
+    # Настройка markdown: поддержка таблиц, ссылок, заголовков
+    return markdown.markdown(
+        md_content,
+        extensions=[
+            "extra",
+            "toc",
+            "fenced_code",
+            "sane_lists",
+            "nl2br",
+        ],
+        output_format="html5",
+    )
+
+@router.get("/{user_id}/docs/setup/{doc_name}", response_class=HTMLResponse)
+async def documentation_page(
+    request: Request,
+    doc_name: str,
+    user=Depends(require_authenticated_user),
+):
+    # Ищем локальный .md файл
+    md_path = DOCS_DIR / f"{doc_name}.md"
+    if not md_path.exists():
+        md_content = f"# Документация '{doc_name}' не найдена\n\nПопробуйте [вернуться на главную страницу](/{user.user_id})."
+        source_info = ""
+    else:
+        md_content = md_path.read_text(encoding="utf-8")
+        source_info = ""
+
+    # Рендерим Markdown в HTML
+    html_content = render_md_to_html(md_content)
+
+    return templates.TemplateResponse(
+        "docs_md_template.html",
+        {
+            "request": request,
+            "username": user.user_name,
+            "user_id": user.user_id,
+            "doc_title": doc_name.replace("-", " ").replace("_", " ").title(),
+            "doc_html": html_content,
+            "source_info": source_info,
+        }
+    )

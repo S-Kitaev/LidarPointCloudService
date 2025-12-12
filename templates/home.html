@@ -8,15 +8,63 @@
 </head>
 <body>
     <header class="main-header">
-        <div class="logo-white"></div>
-        <nav class="main-nav">
-            <a href="/" class="nav-item active">Главная</a>
-        </nav>
+        <a href="/" class="logo-link">
+            <div class="logo-white"></div>
+        </a>
+        <nav class="main-nav"></nav>
 
         <a href="/login" class="login-button">Войти</a>
     </header>
     <main class="main-content">
-        <h1>Добро пожаловать на домашнюю страницу!</h1>
+        <div class="hero-section">
+            <h1>Лидар — облака точек без головной боли</h1>
+            <p class="hero-tagline">Точность. Интеграция. Экономия.</p>
+        </div>
+
+        <!-- Три колонки преимуществ -->
+        <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="2"/>
+                <path d="M12 2v4M12 20v-4M2 12h4M20 12h-4"/>
+            </svg>
+            </div>
+            <h3>Точность</h3>
+            <p>Высокая точность. Работа в реальном времени. 3D-визуализация «из коробки».</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 12H8M16 12L13 9M16 12L13 15"/>
+                <circle cx="4" cy="12" r="1"/>
+                <circle cx="20" cy="12" r="1"/>
+            </svg>
+            </div>
+            <h3>Интеграция</h3>
+            <p>Интуитивный интерфейс. Интеграция с ЦХД.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 12h2a10 10 0 0 0 10 10v-2a8 8 0 0 1-8-8H2Z"/>
+                <path d="M22 12h-2a10 10 0 0 0-10-10v2a8 8 0 0 1 8 8h2Z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            </div>
+            <h3>Экономия</h3>
+            <p>Открытая архитектура. Простое «железо».</p>
+        </div>
+        </div>
+
+        <div class="cta-section">
+            <p>Готовы начать?</p>
+            <a href="/login" class="cta-button">Войти в систему</a>
+        </div>
+        
     </main>
 </body>
 </html>

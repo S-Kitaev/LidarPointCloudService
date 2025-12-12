@@ -1,0 +1,72 @@
+.doc-content {
+    max-width: 960px;
+    margin: 0 auto;       
+    padding: 45px 40px;   
+    line-height: 1.6;
+    text-align: left;
+}
+.doc-content h1, .doc-content h2, .doc-content h3 {
+    color: #004E54;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+.doc-content h1 { font-size: 2.2rem; }
+.doc-content h2 { font-size: 1.6rem; }
+.doc-content h3 { font-size: 1.3rem; }
+
+.doc-content p, .doc-content li {
+    color: #333;
+}
+.doc-content img {
+    max-width: 100%;        /* не вылезать за контейнер */
+    height: auto;           /* сохранять пропорции */
+    display: block;         /* убрать нижний отступ от baseline */
+    margin: 1.5em 0;        /* отступы сверху и снизу */
+    margin-left: 0;         /* ← выравнивание по левому краю */
+    margin-right: 0;
+/* Если хотите центрировать — замените на margin: 1.5em auto; */
+}
+.doc-content a {
+    color: #006D75;
+    text-decoration: underline;
+}
+.doc-content a:hover {
+    color: #004E54;
+}
+.doc-content code {
+    background: #f1f8f8;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.95em;
+}
+.doc-content pre {
+    background: #f5f5f5;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: monospace;
+}
+.doc-content pre code {
+    background: none;
+    padding: 0;
+}
+.doc-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+.doc-content th, .doc-content td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: left;
+}
+.doc-content th {
+    background: #e1f5f5;
+}
+.source-info {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 20px;
+}

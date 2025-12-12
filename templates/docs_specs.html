@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Документация</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+  <header class="main-header">
+    <a href="/{{ user_id }}" class="logo-link">
+      <div class="logo-white"></div>
+    </a>
+    <nav class="main-nav">
+      <a href="/{{ user_id }}/create" class="nav-item">Создание облака точек</a>
+      <a href="/{{ user_id }}/check" class="nav-item">Просмотр облака точек</a>
+      <a href="/{{ user_id }}/connect" class="nav-item">Подключение к ЦХД</a>
+      <a href="/{{ user_id }}/capture" class="nav-item">Снять облако точек</a>
+    </nav>
+    <div class="user-section">
+      <span class="user-name">{{ username }}</span>
+      <div class="user-icon"></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="hero-section">
+      <p class="hero-tagline">Ссылки на документацию к системе</p>
+    </div>
+
+    <div class="quick-links">
+      <div class="quick-link">
+        <h2>Функциональные и нефункциональные требования</h2>
+        <a href="https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/фтт%20нфтт%20v1(22_03_25).md" class="link-button">→ Перейти</a>
+      </div>
+      <div class="quick-link">
+        <h2>Техническое задание к системе</h2>
+        <a href="https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/тз%20v1(22_03_25).md" class="link-button">→ Перейти</a>
+      </div>
+      <div class="quick-link">
+        <h2>Технические требования к системе</h2>
+        <a href="https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/тт%20v1(07_12_25).md" class="link-button">→ Перейти</a>
+      </div>
+      <div class="quick-link">
+        <h2>Концепт проекта</h2>
+        <a href="https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/концепт%20проекта%20v1(01_01_2024).md" class="link-button">→ Перейти</a>
+      </div>
+      <div class="quick-link">
+        <h2>Обоснования проекта</h2>
+        <a href="https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/обоснования%20проекта%20v1(07_12_25).md" class="link-button">→ Перейти</a>
+      </div>
+      <div class="quick-link">
+        <h2>Программа испытаний</h2>
+        <a href="https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/программа%20испытаний%20v1(07_12_25).md" class="link-button">→ Перейти</a>
+      </div>
+
+    </div>
+  </main>
+</body>
+</html>
