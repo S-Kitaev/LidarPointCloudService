@@ -177,15 +177,17 @@ async def check_cloud(
     )
 
 
-@router.get("/{user_id}/check/{experiment_id}", response_class=HTMLResponse)
+@router.get("/{user_id}/check/experiments/{experiment_id}", response_class=HTMLResponse)
 async def view_cloud(
     request: Request, 
     experiment_id: int, 
+    source: str,
     user=Depends(require_authenticated_user), 
-    db=Depends(get_db)
+    # db=Depends(get_db)
 ):
     """Страница просмотра облака точек для конкретного эксперимента"""
-    experiment = get_experiment_by_id(db, experiment_id)
+    experiment = get_experiment_by_id(experiment_id=experiment_id,
+                                      source=source)
     if not experiment:
         raise HTTPException(status_code=404, detail="Эксперимент не найден")
     
@@ -245,15 +247,17 @@ async def chd_get_experiments_api(
         return JSONResponse(status_code=503, content={"ok": False, "message": "Не удается получить эксперименты из ЦХД"})
 
 
-@router.get("/{user_id}/chd/{experiment_id}", response_class=HTMLResponse)
+@router.get("/{user_id}/chd/experiments/{experiment_id}", response_class=HTMLResponse)
 async def view_chd_cloud(
     request: Request, 
     experiment_id: int, 
+    source: str,
     user=Depends(require_authenticated_user), 
-    db=Depends(get_chd)
+    # db=Depends(get_chd)
 ):
     """Страница просмотра облака точек для конкретного эксперимента"""
-    experiment = get_experiment_by_id(db, experiment_id)
+    experiment = get_experiment_by_id(experiment_id=experiment_id,
+                                      source=source)
     if not experiment:
         raise HTTPException(status_code=404, detail="Эксперимент не найден")
     
@@ -270,67 +274,50 @@ async def view_chd_cloud(
     )
 
 
-@router.get("/{user_id}/api/experiments")
-async def get_experiments_api(user=Depends(require_authenticated_user), db=Depends(get_db)):
-    """API для получения списка экспериментов"""
-    experiments = get_all_experiments(db)
-    return JSONResponse(content=[
-        {
-            "id": exp.id,
-            "exp_dt": exp.exp_dt.strftime("%Y-%m-%d %H:%M:%S") if exp.exp_dt else None,
-            "room_description": exp.room_description,
-            "address": exp.address,
-            "object_description": exp.object_description
-        }
-        for exp in experiments
-    ])
-
-
 @router.get("/{user_id}/api/experiments/{experiment_id}/measurements")
 async def get_measurements_api(
     experiment_id: int, 
-    source: str = Query("local"), # Читаем параметр ?source=... (по дефолту local)
-    user=Depends(require_authenticated_user),
-    local_db=Depends(get_db),
-    global_db=Depends(get_chd)
+    source: str,
+    user=Depends(require_authenticated_user)
 ):
     """API для получения измерений эксперимента в сферических координатах"""
 
-    if source == "chd":
-        current_db = global_db
-    else:
-        current_db = local_db
+    try:
+        experiment = get_experiment_by_id(experiment_id=experiment_id, source=source)
 
-
-    experiment = get_experiment_by_id(current_db, experiment_id)
-    if not experiment:
-        raise HTTPException(status_code=404, detail="Эксперимент не найден")
-    
-    measurements = get_measurements_by_experiment_id(current_db, experiment_id)
-    
-    if not measurements:
-        raise HTTPException(status_code=404, detail="Измерения не найдены")
-    
-    # Преобразуем в список координат
-    coordinates = []
-    for m in measurements:
-        coordinates.append({
-            'phi': m.phi,
-            'r': m.r,
-            'theta': m.theta
-        })
-    
-    return JSONResponse(content={
-        "experiment": {
-            "id": experiment.id,
-            "exp_dt": experiment.exp_dt.strftime("%Y-%m-%d %H:%M:%S") if experiment.exp_dt else None,
-            "room_description": experiment.room_description,
-            "address": experiment.address,
-            "object_description": experiment.object_description
-        },
-        "measurements_count": len(measurements),
-        "coordinates": coordinates
-    })
+        if not experiment:
+            raise HTTPException(status_code=404, detail="Эксперимент не найден")
+        
+        measurements = get_measurements_by_experiment_id(experiment_id, source=source)
+        
+        if not measurements:
+            raise HTTPException(status_code=404, detail="Измерения не найдены")
+        
+        # Преобразуем в список координат
+        coordinates = []
+        for m in measurements:
+            coordinates.append({
+                'phi': m.phi,
+                'r': m.r,
+                'theta': m.theta
+            })
+        
+        return JSONResponse(content={
+            "ok": True,
+            "experiment": {
+                "id": experiment.id,
+                "exp_dt": experiment.exp_dt.strftime("%Y-%m-%d %H:%M:%S") if experiment.exp_dt else None,
+                "room_description": experiment.room_description,
+                "address": experiment.address,
+                "object_description": experiment.object_description
+            },
+            "measurements_count": len(measurements),
+            "coordinates": coordinates
+            })
+    except Exception as e:
+        return JSONResponse(content={
+            "ok": False, 
+            "message": str(e)})
 
 
 @router.post("/{user_id}/create/save")

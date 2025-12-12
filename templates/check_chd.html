@@ -52,7 +52,7 @@
     const userId = {{ user_id }};
 
     function viewExperiment(userId, experimentId) {
-      window.location.href = `/${userId}/chd/${experimentId}?source=chd`;
+      window.location.href = `/${userId}/chd/experiments/${experimentId}?source=chd`;
     }
 
     async function syncWithCHD(userId) {
