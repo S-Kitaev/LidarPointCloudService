@@ -6,6 +6,7 @@ class ExperimentCreate(BaseModel):
     room_description: str | None = None
     address: str
     object_description: str | None = None
+    user_id: int
 
 
 class ExperimentRead(BaseModel):

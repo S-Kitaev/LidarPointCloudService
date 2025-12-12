@@ -1,6 +1,6 @@
 -- 1. Создаём таблицу users
 CREATE TABLE IF NOT EXISTS users (
-    user_id       SERIAL PRIMARY KEY,
+    id            SERIAL PRIMARY KEY,
     user_name     VARCHAR(20) UNIQUE NOT NULL,
     user_password VARCHAR(60) NOT NULL,
     email         VARCHAR(50)
@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS experiments(
     exp_dt             TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     room_description   VARCHAR(1000)               NULL,
     address            VARCHAR(200)                NULL,
-    object_description VARCHAR(200)                NULL
+    object_description VARCHAR(200)                NULL,
+    user_id            integer                     REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS measurements (

@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: postgres
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
+      interval: 2s
       timeout: 5s
       retries: 5
     volumes:
@@ -22,7 +22,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/lidar
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "8001:8000"
 

@@ -7,16 +7,50 @@ HES LiDAR project
 
 2. Чтобы запустить его:
 
-   - Склонируйте репозиторий.
+   - Склонируйте репозиторий
+   ```bash
+   git clone https://github.com/S-Kitaev/LidarPointCloudService.git
+   ```
    - Перейдите в папку проекта.
-   - Убедитесь, что у вас установлены **Docker** и **Docker Compose**.
+   ```bash
+   cd LidarPointCloudService
+   ```
+   - Убедитесь, что у вас установлены **Docker** и **Docker Compose**, введите в терминале
+   ```bash
+   docker
+   ```
 
-3. Выполните команду:
+3. Подготовьте репозиторий для запуска приложения:
+
+   - создайте .env файл в корне проекта, вставьте в него текст ниже, установив правильные имена и зависимости, для усновки корректных параметров обращайтесь к разработчикам проекта
+   ```bash
+   DATABASE_URL=...
+   JWT_PRIVATE_KEY_PATH=...
+   JWT_PUBLIC_KEY_PATH=...
+   ACCESS_TOKEN_EXPIRE_MINUTES=...
+
+   LIDAR_HOST=...
+   LIDAR_USER=...
+   LIDAR_PASS=...
+   LIDAR_REMOTE_PATH=...
+
+   CHD_HOST=...
+   CHD_PORT=...
+   CHD_USER=...
+   CHD_PASS=...
+   CHD_NAME=...
+   ```
+   - в папку ```/certs``` вставьте сертификаты доступа, сертификаты запросите у разработчиков проекта:
+     - ```jwt-private.pem```
+     - ```jwt-public.pem```
+
+
+4. Выполните команду:
    ```bash
    docker compose up --build
    ```
-   
-4. Сам API-сервер на порту 8000 внутри контейнера, проброшенном на порт 8001 хоста. Перейдите в браузере по ссылке:
+
+5. Сам API-сервер на порту 8000 внутри контейнера, проброшенном на порт 8001 хоста. Перейдите в браузере по ссылке:
    ```bash
    http://localhost:8001/
    ```
@@ -29,7 +63,7 @@ HES LiDAR project
 - Руководство по запуску ПО - [docs/запуск по v1(07_12_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%20%D0%BF%D0%BE%20v1(07_12_25).md)
 - Руководство по сборке установки - [raspberry/build.md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/raspberry/build.md)
 - Руководство загрузки ПО установки - [raspberry/installation.md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/raspberry/installation.md)
-- API - [docs/api v1(07_12_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/api%20v1(07_12_25).md)
+- API - [docs/api v1(12_12_25).md](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/docs/api%20v1(12_12_25).md)
 
 ### Отчетные документы
 

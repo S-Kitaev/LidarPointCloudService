@@ -6,9 +6,9 @@ class UserCreate(BaseModel):
     email: EmailStr | None = None
 
 class UserRead(BaseModel):
-    user_id: int
+    id: int
     user_name: str
     email: EmailStr | None
 
     class Config:
-        orm_mode = True
+        from_attributes = True

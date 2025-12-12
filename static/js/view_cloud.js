@@ -233,29 +233,50 @@ function loadVisualization(userId, experimentId) {
     const loading = document.getElementById('loading');
     const error = document.getElementById('error');
     const visualization = document.getElementById('visualization');
+    const urlParams = new URLSearchParams(window.location.search);
+    const source = urlParams.get('source') || 'local'; 
     loading.style.display = 'flex';
     error.style.display = 'none';
     visualization.innerHTML = '';
-    fetch(`/${userId}/api/experiments/${experimentId}/measurements`)
+    fetch(`/${userId}/api/experiments/${experimentId}/measurements?source=${source}`)
         .then(response => {
-            if (!response.ok) throw new Error('Ошибка загрузки данных');
-            return response.json();
+            // Сначала парсим JSON, независимо от status code, 
+            // так как сервер может вернуть {ok: false} с кодом 500/404
+            return response.json().then(data => ({ status: response.status, body: data }));
         })
-        .then(data => {
+        .then(({ status, body }) => {
+            // Проверяем логический флаг ok или статус ответа
+            if (!body.ok) {
+                // Если сервер вернул {ok: false, message: "..."}
+                throw new Error(body.message || `Ошибка сервера: ${status}`);
+            }
+            
+            // Если все ок, используем данные
+            const data = body;
+            
             loading.style.display = 'none';
+            
+            // Заголовок
             const header = document.createElement('div');
             header.style.cssText = 'text-align: center; margin-bottom: 20px; font-size: 18px; color: #006D75; font-weight: bold;';
             header.textContent = `3D Облако точек (${data.measurements_count.toLocaleString()} точек)`;
             visualization.appendChild(header);
+            
+            // Контейнер для Three.js
             const threeContainer = document.createElement('div');
             threeContainer.id = 'three-container';
             threeContainer.style.cssText = 'width: 100%; height: 500px; border: 1px solid #dee2e6; border-radius: 4px;';
             visualization.appendChild(threeContainer);
+            
+            // Запуск отрисовки
             createPointCloudVisualization(data.coordinates, 'three-container');
+            
+            // Футер
             const pointCount = document.createElement('div');
             pointCount.style.cssText = 'text-align: center; margin-top: 20px; font-size: 16px; color: #6c757d;';
             pointCount.textContent = `Количество точек: ${data.measurements_count.toLocaleString()}`;
             visualization.appendChild(pointCount);
+            
             const instructions = document.createElement('div');
             instructions.style.cssText = 'text-align: center; margin-top: 10px; font-size: 14px; color: #6c757d;';
             instructions.innerHTML = 'Используйте мышь для вращения, колесо мыши для масштабирования. Наведите на точку для просмотра координат.';
@@ -264,6 +285,6 @@ function loadVisualization(userId, experimentId) {
         .catch(err => {
             loading.style.display = 'none';
             error.style.display = 'block';
-            error.textContent = 'Ошибка загрузки визуализации: ' + err.message;
+            error.textContent = 'Ошибка: ' + err.message;
         });
 }
