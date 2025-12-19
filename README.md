@@ -54,6 +54,13 @@ HES LiDAR project
    ```bash
    http://localhost:8001/
    ```
+
+6. Для полноценного использования ПО совместно с установкой, выполните следующие шаги:
+   - Внимательно ознакомьтесь со [сборкой установки](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/raspberry/build.md), [настройкой установки](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/raspberry/installation.md)
+   - Соберите установку согласно [руководству по сборке установки](https://github.com/S-Kitaev/LidarPointCloudService/blob/main/raspberry/build.md)
+   - Подключите двигатель, плату Raspberry, Wi-Fi модуль к электросети 220В, приведите установку в стартовую позицию
+   - При использовании системы для ее подключения к установке - подключайтесь к Wi-Fi Лидара
+   - При использовании системы для работы с облаком точек - подключайтесь к общедоступному (личному) Wi-Fi
    
 ## Документация к проекту
 
